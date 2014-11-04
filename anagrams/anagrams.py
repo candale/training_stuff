@@ -10,6 +10,10 @@ anagrams = {} # takes the form {anagram: {"no": int, "words": {"letter" : {"is_w
 			  # words - the words from which the anagrams were obtained
 
 def word_is_processed(sorted_word, word):
+	'''
+		Returns wheater or not the current sorted word
+		was already obtained from word contained in the parameter word
+	'''
 	if sorted_word not in anagrams:
 		return False
 
