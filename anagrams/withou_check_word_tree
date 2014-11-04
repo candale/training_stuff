@@ -1,0 +1,45 @@
+import re
+
+
+file_path = "luceafarul"
+word_pattern = re.compile("\w+")
+min_no_letters = 3
+tree = {} # takes the form {'a': {'no': int, 'sub_tree': { ... } } } 
+		  # where no is the number of words that ended at the current node
+		  # sub_tree is the 
+anagrams = {} # takes the form {"no": int, "words": {"letter" : {"word": boolean, "sub_tree": {... }}}} 
+			  # no    - the number of anagrams found
+			  # words - the words from which the anagrams were made
+
+def add_word(word):
+	global tree
+	tmp_tree = tree
+
+	sorted_word = "".join(sorted(word))
+	index = 0
+	len_word = len(sorted_word)
+	while index < len_word:
+		letter = sorted_word[index]
+		if letter not in tmp_tree:
+			# create new sub_tree
+			tmp_tree[letter] =  {}
+
+		if index == len_word - 1:
+			if sorted_word in anagrams:
+				if word not in anagrams[sorted_word]["words"]:
+					anagrams[sorted_word]["no"] += 1
+					anagrams[sorted_word]["words"].add(word)
+			else:
+				anagrams[sorted_word] = {"no": 1, "words": set([word])}
+
+		tmp_tree = tmp_tree[letter]
+		index += 1
+
+
+with open(file_path, "r") as text_file:
+	for line in text_file:
+		for word in word_pattern.findall(line):
+			if len(word) >= min_no_letters:
+				add_word(word)
+
+print []
