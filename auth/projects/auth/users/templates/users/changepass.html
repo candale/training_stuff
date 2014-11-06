@@ -1,0 +1,19 @@
+{% if register %}
+	<html>
+		<body>
+			<p>{{ state }} <p>
+			<form action="/login/changepass/" method="post">
+				{% csrf_token %}
+				old password:
+					<input type="password" name="old_password" value="" /><br />
+				new password:
+					<input type="password" name="new_password" value="" /><br />
+				new password again:
+					<input type="password" name="new_password_again" value="" /><br />
+				<input type="submit" value="Submit" />
+			</form>
+		</body>
+	</html>
+{% else %}
+	<p>{{ state }}</p>
+{% endif %}

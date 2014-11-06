@@ -1,7 +1,7 @@
 <html>
 	<body>
 		<p>{{ state }} <p>
-		<form action="/login/" method="post">
+		<form action="/user/login/" method="post">
 			{% csrf_token %}
 			username:
 				<input type="text" name="username" value="" /><br />
