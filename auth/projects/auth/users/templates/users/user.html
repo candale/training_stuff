@@ -1,0 +1,12 @@
+<html>
+	<body>
+	<p>Details</p>
+		<b>First name:</b> {{ first_name }} <br>
+	{% if last_name %}
+		<b>Last name:</b> {{ last_name}} <br>
+	{% endif %}
+		<b>Username:</b> {{ username }} <br>
+		<b>Email:</b> {{ email }} <br>
+	<a href='/user/{{ username }}/logout/'>Logout</a>
+	</body>
+</html>

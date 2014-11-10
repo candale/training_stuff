@@ -1,14 +1,19 @@
 <html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="login_style.css">
+	</head>	
 	<body>
-		<p>{{ state }} <p>
-		<form action="/user/login/" method="post">
-			{% csrf_token %}
-			username:
-				<input type="text" name="username" value="" /><br />
-			password:
-				<input type="password" name="password" value="" /><br />
+		<div style="position:absolute; top: 50%; left: 50%; margin-top: -130px; margin-left: -130px;">
+			<p>{{ state }} </p>
+			<form action="/user/login/" method="post">
+				{% csrf_token %}
+				username:
+					<input type="text" name="username" value="" /><br />
+				password:
+					<input type="password" name="password" value="" /><br />
 
-			<input type="submit" value="Log In" />
-		</form>
+				<input type="submit" value="Log In" /> OR <a href="/user/register/">Register</a>
+			</form> 
+		</div>
 	</body>
 </html>

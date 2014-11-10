@@ -22,31 +22,22 @@ class UserManager(models.Manager):
 
         return user
 
-    def _check_create_user_data(self, data):
-        if not 'first_name':
-            raise ValueError("First name is madatory")
-
-        if not 'username':
-            raise ValueError("Username is mandatory")
-
-        if not 'email':
-            raise ValueError("Email is mandatory")
-
-        if not 'password' or not 'new_password':
-            raise ValueError("Password is mandatory")
-
-        if data['password'] != data['new_password']:
-            raise ValueError('Passwords do not match')
 
     def create_user(self, data):
+        if self.get_user(username=data['username']) is not None:
+            raise ValueError('The username is taken')
+        if self.get_user(email=data['email']) is not None:
+            raise ValueError('The email is already used')
+
         self._check_create_user_data(data)
         new_user = User(
                 first_name=data['first_name'],
                 last_name=data['last_name'],
                 username=data['username'],
-                email=data.get['email'],
+                email=data['email'],
                 )
         new_user.set_password(data['password'])
+        new_user.save()
 
         return True
 
@@ -62,14 +53,45 @@ class UserManager(models.Manager):
 
         return True
 
-    def get_user(self, username=None):
+
+    def get_user(self, username=None, email=None):
+        kwargs = dict()
+
         if username is not None:
-            try:
-                user = User.objects.get(username=username)
-            except ObjectDoesNotExist:
-                return None
-            else:
-                return user
+            kwargs['username'] = username
+        if email is not None:
+            kwargs['email'] = email
+
+        try:
+            user = User.objects.get(**kwargs)
+        except User.DoesNotExist:
+            return None
+        else:
+            return user
+
+
+    def get_loggedin_user(self, session_id):
+        try:
+            return User.objects.get(session_id=session_id)
+        except ObjectDoesNotExist:
+            return None
+
+    def _check_create_user_data(self, data):
+        if not data['first_name']:
+            raise ValueError("First name is madatory")
+
+        if not data['username']:
+            raise ValueError("Username is mandatory")
+
+        if not data['email']:
+            raise ValueError("Email is mandatory")
+
+        if not data['password'] or not 'password_again':
+            raise ValueError("Password is mandatory")
+
+        if data['password'] != data['password_again']:
+            raise ValueError('Passwords do not match')
+
 
 
 class User(AbstractBaseUser):
@@ -82,6 +104,7 @@ class User(AbstractBaseUser):
     banned_until = models.DateTimeField('date until user is banned', blank=True, null=True)
     failed_attempts_count = models.IntegerField('faild attempts count', default=0)
     first_faild_attept_time =  models.DateTimeField('date of the first failed attempt', blank=True, null=True)
+    session_id = models.CharField(max_length=40, null=True, unique=True)
 
     objects = UserManager()
 
@@ -143,6 +166,19 @@ class User(AbstractBaseUser):
 
         self.save()
 
+
+    def login(self, session_id):
+        self.session_id = session_id
+        self.save()
+
+
+    def logout(self):
+        self.session_id = None
+        self.save()
+
+
+    def is_logged_in(self):
+        return self.session_id is not None
 
     def __str__(self):
         return self.username

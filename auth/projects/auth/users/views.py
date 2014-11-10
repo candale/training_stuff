@@ -5,11 +5,30 @@ from django.template import RequestContext
 from users.models import User
 
 def index(request):
-	return HttpResponse('need to redirect if user already loggined')
+	user = User.objects.get_loggedin_user(request.session.session_key) 
+	if user is not None:
+		return redirect('/user/%s/' % user.username)
+	else:
+		return redirect('/user/login/')
 
 
-def user(user, username):
-	return HttpResponse(username)
+def user(request, username):
+	user = User.objects.get_user(username=username)
+	if user is None or user.is_logged_in() is False:
+		return redirect('/user/login/')
+		
+	info = dict()
+	info['first_name'] = user.first_name
+	info['last_name'] = user.last_name
+	info['username'] = user.username
+	info['email'] = user.email
+	return render_to_response('users/user.html', info, RequestContext(request))
+
+
+def logout(request, username):
+	user = User.objects.get_user(username=username)
+	user.logout()
+	return redirect('/user/login/')
 
 
 def change_password(request, username):
@@ -32,22 +51,29 @@ def change_password(request, username):
 
 
 def login(request):
+	user = User.objects.get_loggedin_user(request.session.session_key) 
+	if user is not None:
+		return redirect('/user/%s/' % user.username)
+
 	state = "Please sign in below"
 	if request.POST:
 		username_form = request.POST.get('username')
 		password_form = request.POST.get('password')
 
 		try:
-			if User.objects.authenticate(username_form, password_form):
-				return redirect("/user/%s/" % username_form)
+			user = User.objects.authenticate(username_form, password_form)
 		except ValueError as e:
 			state = e.message
+		else:
+			user.login(request.session.session_key)
+			return redirect("/user/%s/" % username_form)
 
 	return render_to_response('users/login.html', {'state': state}, RequestContext(request))
 
 
 def register(request):
 	state = 'Register'
+
 	if request.POST:
 		data = request.POST.copy()
 		try:
@@ -56,4 +82,7 @@ def register(request):
 			state = e.message
 		else:
 			return redirect('/user/login/')
+
+
+	return render_to_response('users/register.html', {'state': state}, RequestContext(request))
 

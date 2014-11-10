@@ -1,0 +1,21 @@
+<html>
+	<body>
+		<p>{{ state }} <p>
+		<form action="/user/register/" method="post">
+			{% csrf_token %}
+			first name:
+				<input type="text" name="first_name" value="{{ first_name }}" /><br />
+			last name:
+				<input type="text" name="last_name" value="{{ last_name }}" /><br />
+			username:
+				<input type="text" name="username" value="{{ username }}" /><br />
+			email
+				<input type="text" name="email" value="{{ email }}" /><br />
+			password:
+				<input type="password" name="password" value="" /><br />
+			password again:
+				<input type="password" name="password_again" value="" /><br />
+			<input type="submit" value="Submit" />
+		</form>
+	</body>
+</html>
